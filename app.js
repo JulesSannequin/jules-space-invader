@@ -5,6 +5,7 @@ world.width = world.clientWidth;
 world.height = world.clientHeight;
 
 let frames = 0;
+const missiles = [];
 
 const keys = {
   ArrowLeft: { pressed: false },
@@ -24,10 +25,23 @@ class Player {
       y: world.height - this.height,
     };
   }
+
   draw() {
     c.fillStyle = "white";
     c.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
+
+  shoot() {
+    missiles.push(
+      new Missile({
+        position: {
+          x: this.position.x + this.width / 2,
+          y: this.position.y,
+        },
+      })
+    );
+  }
+
   update() {
     if (keys.ArrowLeft.pressed && this.position.x >= 0) {
       this.velocity.x = -5;
@@ -45,6 +59,25 @@ class Player {
   }
 }
 
+class Missile {
+  constructor({ position }) {
+    this.position = position;
+    this.velocity = { x: 0, y: -5 };
+    this.width = 3;
+    this.height = 10;
+  }
+
+  draw() {
+    c.fillStyle = "red";
+    c.fillRect(this.position.x, this.position.y, this.width, this.height);
+  }
+
+  update() {
+    this.position.y += this.velocity.y;
+    this.draw();
+  }
+}
+
 const player = new Player();
 
 const animationLoop = () => {
@@ -52,6 +85,15 @@ const animationLoop = () => {
   c.clearRect(0, 0, world.width, world.height);
   //   console.log(frames);
   player.update();
+  missiles.forEach((missile, index) => {
+    if (missile.position.y + missile.height <= 0) {
+      setTimeout(() => {
+        missiles.splice(index, 1);
+      });
+    } else {
+      missile.update();
+    }
+  });
   frames++;
 };
 animationLoop();
