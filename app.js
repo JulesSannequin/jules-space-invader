@@ -20,15 +20,27 @@ class Player {
       x: 0,
       y: 0,
     };
-    this.position = {
-      x: (world.width - this.width) / 2,
-      y: world.height - this.height,
+    const image = new Image();
+    image.src = "./spaceship.png";
+    image.onload = () => {
+      this.image = image;
+      this.width = 40;
+      this.height = 40;
+      this.position = {
+        x: world.width / 2 - this.width / 2,
+        y: world.height - this.height - 10,
+      };
     };
   }
 
   draw() {
-    c.fillStyle = "white";
-    c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    c.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
   }
 
   shoot() {
@@ -43,19 +55,21 @@ class Player {
   }
 
   update() {
-    if (keys.ArrowLeft.pressed && this.position.x >= 0) {
-      this.velocity.x = -5;
-    } else if (
-      keys.ArrowRight.pressed &&
-      this.position.x <= world.width - this.width
-    ) {
-      this.velocity.x = 5;
-    } else {
-      this.velocity.x = 0;
-    }
+    if (this.image) {
+      if (keys.ArrowLeft.pressed && this.position.x >= 0) {
+        this.velocity.x = -5;
+      } else if (
+        keys.ArrowRight.pressed &&
+        this.position.x <= world.width - this.width
+      ) {
+        this.velocity.x = 5;
+      } else {
+        this.velocity.x = 0;
+      }
 
-    this.position.x += this.velocity.x;
-    this.draw();
+      this.position.x += this.velocity.x;
+      this.draw();
+    }
   }
 }
 
