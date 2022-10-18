@@ -114,7 +114,7 @@ class Alien {
   shoot(alienMissiles) {
     if (this.position) {
       alienMissiles.push(
-        new alienMissiles({
+        new alienMissile({
           position: {
             x: this.position.x,
             y: this.position.y,
@@ -151,10 +151,10 @@ class Missile {
 class Grid {
   constructor() {
     this.position = { x: 0, y: 0 };
-    this.velocity = { x: 0.5, y: 0 };
+    this.velocity = { x: 1, y: 0 };
     this.invaders = [];
-    // let rows = Math.floor((world.height / 36) * (1 / 3));
-    // const colums = Math.floor((world.width / 36) * (2 / 3));
+    let rows = Math.floor((world.height / 36) * (1 / 3));
+    const colums = Math.floor((world.width / 36) * (2 / 3));
     this.height = rows * 36;
     this.width = colums * 36;
     for (let x = 0; x < colums; x++) {
@@ -176,13 +176,34 @@ class Grid {
     this.position.y += this.velocity.y;
     this.velocity.y = 0;
     if (this.position.x + this.width >= world.width || this.position.x == 0) {
-      this.velocity.x = this.velocity.x;
+      this.velocity.x = -this.velocity.x;
       this.velocity.y = 34;
     }
   }
 }
 
+class alienMissile {
+  constructor({ position, velocity }) {
+    this.position = position;
+    this.velocity = velocity;
+    this.width = 5;
+    this.height = 10;
+  }
+  draw() {
+    c.fillStyle = "yellow";
+    c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    c.fill();
+  }
+  update() {
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+    this.draw();
+  }
+}
+
 const missiles = [];
+
+const alienMissiles = [];
 
 let grids = [new Grid()];
 
@@ -208,9 +229,25 @@ const animationLoop = () => {
 
   grids.forEach((grid) => {
     grid.update();
+    if (frames % 50 === 0 && grid.invaders.length > 0) {
+      grid.invaders[Math.floor(Math.random() * grid.invaders.length)].shoot(
+        alienMissiles
+      );
+      console.log(alienMissiles);
+    }
     grid.invaders.forEach((invader) => {
       invader.update({ velocity: grid.velocity });
     });
+  });
+
+  alienMissiles.forEach((alienMissile, index) => {
+    if (alienMissile.position.y + alienMissile.height >= world.height) {
+      setTimeout(() => {
+        alienMissiles.splice(index, 1);
+      }, 0);
+    } else {
+      alienMissile.update();
+    }
   });
 
   frames++;
