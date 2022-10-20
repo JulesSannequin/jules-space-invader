@@ -9,6 +9,7 @@ let frames = 0;
 const keys = {
   ArrowLeft: { pressed: false },
   ArrowRight: { pressed: false },
+  fired: { pressed: false },
 };
 
 class Player {
@@ -229,15 +230,26 @@ class alienMissile {
   }
 }
 
-const missiles = [];
+let missiles;
+let alienMissiles;
+let grids;
+let player;
+let particules;
+let lifes;
 
-const alienMissiles = [];
+const init = () => {
+  missiles = [];
+  alienMissiles = [];
+  grids = [new Grid()];
+  player = new Player();
+  particules = [];
+  lifes = 3;
+  keys.ArrowLeft.pressed = false;
+  keys.ArrowRight.pressed = false;
+  keys.fired.pressed = false;
+};
 
-let grids = [new Grid()];
-
-const player = new Player();
-
-let particules = [];
+init();
 
 const animationLoop = () => {
   c.clearRect(0, 0, world.width, world.height);
@@ -291,7 +303,7 @@ const animationLoop = () => {
           setTimeout(() => {
             grid.invaders.splice(indexI, 1);
             missiles.splice(indexM, 1);
-            if (grid.invaders.length === 0 && grids.length === 1) {
+            if (grid.invaders.length === 0 && grids.length == 1) {
               grids.splice(indexGrid, 1);
               grids.push(new Grid());
             }
@@ -317,6 +329,23 @@ const animationLoop = () => {
         player.position.x + player.width
     ) {
       alienMissiles.splice(index, 1);
+      for (let i = 0; i < 22; i++) {
+        particules.push(
+          new Particule({
+            position: {
+              x: player.position.x + player.width / 2,
+              y: player.position.y + player.height / 2,
+            },
+            velocity: {
+              x: (Math.random() - 0.5) * 2,
+              y: (Math.random() - 0.5) * 2,
+            },
+            radius: Math.random() * 5,
+            color: "white",
+          })
+        );
+      }
+      lostLife();
     }
   });
 
@@ -331,6 +360,14 @@ const animationLoop = () => {
   frames++;
 };
 animationLoop();
+
+const lostLife = () => {
+  lifes--;
+  if (lifes <= 0) {
+    alert("not this time , try again 🤡");
+    init();
+  }
+};
 
 addEventListener("keydown", ({ key }) => {
   switch (key) {
