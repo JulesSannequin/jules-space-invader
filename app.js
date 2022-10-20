@@ -105,8 +105,9 @@ class Alien {
     if (this.image) {
       this.position.x += velocity.x;
       this.position.y += velocity.y;
-      if (this.position.y + this.height >= world.height) {
-        console.log("you loose bro 👽");
+      if (this.position.y + this.height >= world.height - player.height) {
+        alert("you loose bro 👽");
+        init();
       }
     }
     this.draw();
@@ -152,7 +153,7 @@ class Missile {
 class Grid {
   constructor() {
     this.position = { x: 0, y: 0 };
-    this.velocity = { x: 1, y: 0 };
+    this.velocity = { x: 1.5, y: 0 };
     this.invaders = [];
     let rows = Math.floor((world.height / 36) * (1 / 3));
     const colums = Math.floor((world.width / 36) * (2 / 3));
